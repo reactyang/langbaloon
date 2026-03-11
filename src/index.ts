@@ -1,0 +1,10 @@
+export { Game } from './components/Game';
+export { Menu } from './components/Menu';
+export { GameCanvas } from './components/Canvas';
+export { GameInput } from './components/Input';
+export { GameStats } from './components/Stats';
+export { ResultScreen } from './components/ResultScreen';
+export { useGame } from './hooks/useGame';
+export * from './types';
+export * from './lib/game';
+export * from './lib/dict-factory';

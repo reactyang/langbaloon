@@ -1,0 +1,35 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+header h1 {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 1.8rem;
+  background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  font-size: 1.1rem;
+}
+
+.stat {
+  padding: 5px 15px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+}
+
+.stat span {
+  font-weight: bold;
+  color: #ffd93d;
+}
