@@ -6,19 +6,23 @@ interface StatsProps {
   lives: number;
   wordPool: DictWord[];
   balloons: Balloon[];
+  onRestart?: () => void;
 }
 
-export function GameStats({ score, lives, wordPool, balloons }: StatsProps) {
+export function GameStats({ score, lives, wordPool, balloons, onRestart }: StatsProps) {
   const poppedIds = new Set(balloons.filter(b => b.popped).map(b => b.word.id));
   const remaining = wordPool.filter(w => !poppedIds.has(w.id)).length;
 
   return (
     <header>
-      <h1>🎈 汉语气球射击</h1>
+      <h1>🎈 Chinese Balloon Shooter</h1>
       <div className="stats">
-        <div className="stat">分数: <span>{score}</span></div>
-        <div className="stat">生命: <span>{lives}</span></div>
-        <div className="stat">剩余: <span>{remaining}</span></div>
+        <div className="stat">Score: <span>{score}</span></div>
+        <div className="stat">Lives: <span>{lives}</span></div>
+        <div className="stat">Remaining: <span>{remaining}</span></div>
+        {onRestart && (
+          <button className="restart-btn" onClick={onRestart}>Restart</button>
+        )}
       </div>
     </header>
   );

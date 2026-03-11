@@ -26,7 +26,7 @@ export function GameInput({ onSubmit, disabled = false }: InputProps) {
         type="text"
         id="pinyinInput"
         className={shake ? 'shake' : ''}
-        placeholder="输入拼音..."
+        placeholder="Enter pinyin..."
         autoComplete="off"
         autoFocus
         value={value}
@@ -34,7 +34,7 @@ export function GameInput({ onSubmit, disabled = false }: InputProps) {
         onKeyDown={handleKeyDown}
         disabled={disabled}
       />
-      <div className="instructions">输入拼音后按 Enter 射击气球</div>
+      <div className="instructions">Type pinyin and press Enter to pop balloon</div>
     </div>
   );
 }

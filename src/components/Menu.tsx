@@ -74,7 +74,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
     if (gameMode === 'select') {
       wordPool = words.filter(w => selectedWordIds.has(w.id));
       if (wordPool.length === 0) {
-        alert('请至少选择一个词汇');
+        alert('Please select at least one word');
         return;
       }
     } else {
@@ -89,7 +89,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
       }
 
       if (wordPool.length === 0) {
-        alert('没有可用的词汇，请选择类别');
+        alert('No words available. Please select a category.');
         return;
       }
     }
@@ -100,11 +100,11 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
   return (
     <div className="menu-overlay">
       <div className="menu">
-        <h2>选择词汇开始游戏</h2>
+        <h2>Select Words to Start</h2>
         
         {/* Game Mode */}
         <div className="menu-section">
-          <h3>游戏模式</h3>
+          <h3>Game Mode</h3>
           <div className="mode-selector">
             <label className="mode-option">
               <input
@@ -114,7 +114,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
                 checked={gameMode === 'select'}
                 onChange={() => setGameMode('select')}
               />
-              <span>选择词汇</span>
+              <span>Select Words</span>
             </label>
             <label className="mode-option">
               <input
@@ -124,14 +124,14 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
                 checked={gameMode === 'random'}
                 onChange={() => setGameMode('random')}
               />
-              <span>随机抽取</span>
+              <span>Random</span>
             </label>
           </div>
         </div>
 
         {/* Categories */}
         <div className="menu-section">
-          <h3>选择类别</h3>
+          <h3>Categories</h3>
           <div className="category-grid">
             {categories.map(cat => (
               <button
@@ -145,15 +145,15 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
             ))}
           </div>
           <div className="quick-actions">
-            <button className="quick-btn" onClick={selectAllCategories}>全选</button>
-            <button className="quick-btn" onClick={clearAllCategories}>清除</button>
+            <button className="quick-btn" onClick={selectAllCategories}>Select All</button>
+            <button className="quick-btn" onClick={clearAllCategories}>Clear</button>
           </div>
         </div>
 
         {/* Random mode options */}
         {gameMode === 'random' && (
           <div className="menu-section">
-            <h3>随机设置</h3>
+            <h3>Random Settings</h3>
             <div className="word-count-selector">
               <label>
                 <input
@@ -163,7 +163,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
                   checked={wordCountMode === 'all'}
                   onChange={() => setWordCountMode('all')}
                 />
-                <span>全部词汇</span>
+                <span>All Words</span>
               </label>
               <label>
                 <input
@@ -173,7 +173,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
                   checked={wordCountMode === 'custom'}
                   onChange={() => setWordCountMode('custom')}
                 />
-                <span>随机抽取</span>
+                <span>Random Count</span>
               </label>
               {wordCountMode === 'custom' && (
                 <>
@@ -184,7 +184,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
                     value={randomCount}
                     onChange={(e) => setRandomCount(parseInt(e.target.value) || 10)}
                   />
-                  <span>个词汇</span>
+                  <span>words</span>
                 </>
               )}
             </div>
@@ -194,15 +194,15 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
         {/* Word Selection (for select mode) */}
         {gameMode === 'select' && (
           <div className="menu-section">
-            <h3>选择词汇 (点击选择)</h3>
+            <h3>Select Words</h3>
             <div className="quick-actions">
-              <button className="quick-btn" onClick={selectAllWords}>全选</button>
-              <button className="quick-btn" onClick={clearAllWords}>清除</button>
-              <button className="quick-btn" onClick={selectEasyWords}>简单词汇</button>
+              <button className="quick-btn" onClick={selectAllWords}>Select All</button>
+              <button className="quick-btn" onClick={clearAllWords}>Clear</button>
+              <button className="quick-btn" onClick={selectEasyWords}>Easy Only</button>
             </div>
             <div className="word-list">
               {filteredWords.length === 0 ? (
-                <div className="empty-state">请选择类别</div>
+                <div className="empty-state">Please select a category</div>
               ) : (
                 filteredWords.map(word => (
                   <label
@@ -222,17 +222,17 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
               )}
             </div>
             <div className="selection-stats">
-              已选择: {selectedWordIds.size} 个词汇
+              Selected: {selectedWordIds.size} words
             </div>
           </div>
         )}
 
         {/* Game Settings */}
         <div className="menu-section">
-          <h3>游戏设置</h3>
+          <h3>Game Settings</h3>
           <div className="word-count-selector">
             <label>
-              <span>气球数量上限: </span>
+              <span>Max Balloons: </span>
               <input
                 type="number"
                 min={3}
@@ -242,7 +242,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
               />
             </label>
             <label>
-              <span>生命值: </span>
+              <span>Lives: </span>
               <input
                 type="number"
                 min={1}
@@ -256,7 +256,7 @@ export function Menu({ categories, words, onStartGame }: MenuProps) {
 
         <div className="menu-buttons">
           <button className="btn btn-primary" onClick={handleStart}>
-            开始游戏
+            Start Game
           </button>
         </div>
       </div>

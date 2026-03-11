@@ -197,6 +197,7 @@ export function Game() {
           lives={gameState.lives}
           wordPool={gameState.wordPool}
           balloons={gameState.balloons}
+          onRestart={restartGame}
         />
       )}
       

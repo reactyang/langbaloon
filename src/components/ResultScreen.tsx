@@ -11,21 +11,21 @@ export function ResultScreen({ isWon, score, time, onRestart }: ResultScreenProp
   return (
     <div className="result-overlay">
       <div className={`result ${isWon ? 'won' : 'lost'}`}>
-        <h2>{isWon ? '🎉 恭喜获胜' : '💔 游戏结束'}</h2>
+        <h2>{isWon ? '🎉 Congratulations!' : '💔 Game Over'}</h2>
         <p>
           {isWon 
-            ? '你成功击破了所有气球' 
-            : '很遗憾你没有成功...'
+            ? 'You popped all the balloons!' 
+            : 'Better luck next time...'
           }
         </p>
         <p>
-          得分: <span>{score}</span>
+          Score: <span>{score}</span>
           {time !== undefined && (
-            <> | 用时: <span>{time}</span>秒</>
+            <> | Time: <span>{time}</span> seconds</>
           )}
         </p>
         <button className="btn btn-secondary" onClick={onRestart}>
-          {isWon ? '再玩一次' : '再试一次'}
+          {isWon ? 'Play Again' : 'Try Again'}
         </button>
       </div>
     </div>
