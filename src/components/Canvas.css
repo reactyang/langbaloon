@@ -3,4 +3,5 @@
   border-radius: 15px;
   margin: 10px 0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, #87ceeb 0%, #e0f7fa 100%);
 }

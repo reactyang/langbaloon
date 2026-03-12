@@ -8,31 +8,58 @@ export function createBalloon(word: DictWord, canvasWidth: number, config: GameC
   const padding = 80;
   const x = padding + Math.random() * (canvasWidth - padding * 2);
   
-  return {
+  // Spawn at bottom of canvas (below visible area)
+  const canvasHeight = 600;
+  const startY = canvasHeight + 60;
+  
+  const balloon: Balloon = {
     id,
     word,
     x,
-    y: -60,
-    speed: config.balloonSpeedMin + Math.random() * (config.balloonSpeedMax - config.balloonSpeedMin),
+    y: startY,
+    // Negative speed to float upward
+    speed: -(config.balloonSpeedMin + Math.random() * (config.balloonSpeedMax - config.balloonSpeedMin)),
     wobble: Math.random() * Math.PI * 2,
     wobbleSpeed: 0.02 + Math.random() * 0.02,
     popped: false,
     scale: 1,
   };
+
+  console.log('[createBalloon] Created balloon:', word.chinese, 'x:', x, 'y:', startY);
+  return balloon;
 }
 
-export function updateBalloon(balloon: Balloon, _canvasWidth: number, _canvasHeight: number): Balloon {
+export function updateBalloon(balloon: Balloon, canvasWidth: number, canvasHeight: number): Balloon {
   if (balloon.popped) {
-    return { ...balloon, y: balloon.y - 5, scale: balloon.scale * 0.9 };
+    // Popped balloons shrink and fade away
+    return { ...balloon, y: balloon.y - 3, scale: balloon.scale * 0.92 };
   }
 
-  const newY = balloon.y + balloon.speed;
+  let newY = balloon.y + balloon.speed;
   const wobbleX = Math.sin(balloon.wobble) * 2;
   const newWobble = balloon.wobble + balloon.wobbleSpeed;
 
+  // Keep balloon within canvas bounds - wrap around when reaching top
+  const balloonHeight = 110; // balloon height with string
+  const bottomSpawn = canvasHeight + 50; // spawn below canvas
+  
+  // If balloon goes above visible area, wrap to bottom to respawn
+  if (newY < -balloonHeight) {
+    newY = bottomSpawn;
+  }
+  
+  // Keep balloon within horizontal bounds
+  let newX = balloon.x + wobbleX;
+  const balloonWidth = 45;
+  if (newX < balloonWidth) {
+    newX = balloonWidth;
+  } else if (newX > canvasWidth - balloonWidth) {
+    newX = canvasWidth - balloonWidth;
+  }
+  
   return {
     ...balloon,
-    x: balloon.x + wobbleX,
+    x: newX,
     y: newY,
     wobble: newWobble,
   };
@@ -71,10 +98,10 @@ export function popBalloon(balloon: Balloon): Balloon {
 }
 
 export const defaultConfig: GameConfig = {
-  balloonSpeedMin: 0.5,
-  balloonSpeedMax: 1.5,
-  spawnInterval: 2000,
-  maxBalloons: 8,
+  balloonSpeedMin: 1.5,
+  balloonSpeedMax: 2.5,
+  spawnInterval: 2500,
+  maxBalloons: 6,
   maxLives: 3,
 };
 

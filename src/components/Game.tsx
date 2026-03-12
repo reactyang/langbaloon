@@ -40,6 +40,16 @@ export function Game() {
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const animationRef = useRef<number | null>(null);
   const lastSpawnRef = useRef<number>(0);
+  
+  // Use refs to hold current values for the game loop
+  const gameModeRef = useRef(gameMode);
+  const gameStateRef = useRef(gameState);
+  const canvasSizeRef = useRef(canvasSize);
+  
+  // Keep refs in sync
+  gameModeRef.current = gameMode;
+  gameStateRef.current = gameState;
+  canvasSizeRef.current = canvasSize;
 
   const categories = builtInDictionary.getCategories();
   const words = builtInDictionary.getWords();
@@ -72,18 +82,32 @@ export function Game() {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  const spawnBalloon = useCallback((wordPool: DictWord[], balloons: Balloon[], config: GameConfig): Balloon | null => {
+  // Stable spawnBalloon function using refs
+  const spawnBalloonFn = useCallback((wordPool: DictWord[], balloons: Balloon[], config: GameConfig): Balloon | null => {
     const poppedIds = new Set(balloons.filter(b => b.popped).map(b => b.word.id));
     const unusedWords = wordPool.filter(w => !poppedIds.has(w.id));
     
-    if (unusedWords.length === 0) return null;
+    console.log('[spawnBalloon] wordPool length:', wordPool.length, 'unusedWords length:', unusedWords.length, 'popped balloons:', balloons.filter(b => b.popped).length);
+    
+    if (unusedWords.length === 0) {
+      console.log('[spawnBalloon] No unused words available!');
+      return null;
+    }
 
     const word = unusedWords[Math.floor(Math.random() * unusedWords.length)];
-    return createBalloon(word, canvasSize.width, config);
-  }, [canvasSize.width]);
+    return createBalloon(word, canvasSizeRef.current.width, config);
+  }, []);
 
+  // Game loop using refs (stable, doesn't change)
   const gameLoop = useCallback(() => {
-    if (gameMode !== 'playing' || !gameState) return;
+    const currentGameMode = gameModeRef.current;
+    const currentGameState = gameStateRef.current;
+    const currentCanvasSize = canvasSizeRef.current;
+    
+    if (currentGameMode !== 'playing' || !currentGameState) {
+      // Stop the loop if not playing
+      return;
+    }
 
     setGameState(prev => {
       if (!prev) return prev;
@@ -92,19 +116,27 @@ export function Game() {
 
       // Spawn new balloons
       let newBalloons = [...prev.balloons];
-      if (now - lastSpawnRef.current > prev.config.spawnInterval && 
-          newBalloons.filter(b => !b.popped).length < prev.config.maxBalloons) {
-        const newBalloon = spawnBalloon(prev.wordPool, newBalloons, prev.config);
+      const activeBalloons = newBalloons.filter(b => !b.popped);
+      const timeSinceLastSpawn = now - lastSpawnRef.current;
+      
+      console.log('[gameLoop] timeSinceLastSpawn:', timeSinceLastSpawn, 'spawnInterval:', prev.config.spawnInterval, 'activeBalloons:', activeBalloons.length, 'maxBalloons:', prev.config.maxBalloons);
+      
+      if (timeSinceLastSpawn > prev.config.spawnInterval && 
+          activeBalloons.length < prev.config.maxBalloons) {
+        const newBalloon = spawnBalloonFn(prev.wordPool, newBalloons, prev.config);
         if (newBalloon) {
           newBalloons.push(newBalloon);
           lastSpawnRef.current = now;
+          console.log('[gameLoop] Added new balloon, total:', newBalloons.length);
         }
       }
 
       // Update balloons
       newBalloons = newBalloons
-        .map(b => updateBalloon(b, canvasSize.width, canvasSize.height))
-        .filter(b => b.y > -100 && b.scale > 0.1);
+        .map(b => updateBalloon(b, currentCanvasSize.width, currentCanvasSize.height))
+        // Only remove popped balloons when they've shrunk away (scale <= 0.05)
+        // Balloons should stay in the game until popped by correct pinyin input
+        .filter(b => !b.popped || b.scale > 0.05);
 
       // Check win/lose
       const tempState = { ...prev, balloons: newBalloons };
@@ -123,12 +155,13 @@ export function Game() {
     });
 
     animationRef.current = requestAnimationFrame(gameLoop);
-  }, [gameMode, gameState, canvasSize, spawnBalloon]);
+  }, [spawnBalloonFn]);
 
-  // Run game loop
+  // Run game loop - only depends on gameMode, not the callback itself
   useEffect(() => {
     if (gameMode === 'playing') {
       lastSpawnRef.current = Date.now();
+      console.log('[useEffect] Starting game loop, lastSpawnRef reset');
       animationRef.current = requestAnimationFrame(gameLoop);
     }
 
@@ -137,7 +170,7 @@ export function Game() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameMode, gameLoop]);
+  }, [gameMode]); // Removed gameLoop from dependencies
 
   const startGame = (wordPool: DictWord[], config?: Partial<GameConfig>) => {
     const mergedConfig = { ...defaultConfig, ...config };

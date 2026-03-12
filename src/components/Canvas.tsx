@@ -33,8 +33,18 @@ export function GameCanvas({ balloons, categories, canvasWidth, canvasHeight }: 
     // Draw clouds
     drawClouds(ctx, canvas.width, canvas.height);
 
-    // Draw balloons
+    console.log('[Canvas draw] balloons count:', balloons.length, 'categories count:', categories.length);
+    
+    // Draw balloons (debug: log if empty)
+    if (balloons.length === 0) {
+      ctx.fillStyle = '#666';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Select words and start the game!', canvas.width / 2, canvas.height / 2);
+    }
+    
     balloons.forEach(balloon => {
+      console.log('[Canvas draw] Drawing balloon:', balloon.word.chinese, 'at x:', balloon.x, 'y:', balloon.y, 'popped:', balloon.popped);
       drawBalloon(ctx, balloon, categories);
     });
   }, [balloons, categories]);
@@ -138,13 +148,18 @@ function drawBalloon(ctx: CanvasRenderingContext2D, balloon: Balloon, categories
   ctx.quadraticCurveTo(Math.sin(balloon.wobble) * 10, 70, 0, 90);
   ctx.stroke();
 
-  // Chinese character
+  // Chinese character - use system fonts that support Chinese
   ctx.fillStyle = 'white';
-  ctx.font = 'bold 28px "Noto Sans SC", "ZCOOL XiaoWei", serif';
+  ctx.font = 'bold 24px "Noto Sans SC", "Microsoft YaHei", "SimHei", "SimSun", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-  ctx.shadowBlur = 4;
+  
+  // Draw text with shadow for better visibility
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+  ctx.shadowBlur = 3;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 1;
+  
   ctx.fillText(word.chinese, 0, -5);
 
   ctx.restore();
