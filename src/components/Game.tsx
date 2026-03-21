@@ -84,10 +84,11 @@ export function Game() {
 
   // Stable spawnBalloon function using refs
   const spawnBalloonFn = useCallback((wordPool: DictWord[], balloons: Balloon[], config: GameConfig): Balloon | null => {
-    const poppedIds = new Set(balloons.filter(b => b.popped).map(b => b.word.id));
-    const unusedWords = wordPool.filter(w => !poppedIds.has(w.id));
+    // Exclude words from BOTH popped AND active balloons
+    const usedWordIds = new Set(balloons.map(b => b.word.id));
+    const unusedWords = wordPool.filter(w => !usedWordIds.has(w.id));
     
-    console.log('[spawnBalloon] wordPool length:', wordPool.length, 'unusedWords length:', unusedWords.length, 'popped balloons:', balloons.filter(b => b.popped).length);
+    console.log('[spawnBalloon] wordPool length:', wordPool.length, 'unusedWords length:', unusedWords.length, 'usedWords:', balloons.length);
     
     if (unusedWords.length === 0) {
       console.log('[spawnBalloon] No unused words available!');
