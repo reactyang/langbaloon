@@ -8,16 +8,17 @@ export function createBalloon(word: DictWord, canvasWidth: number, config: GameC
   const padding = 80;
   const x = padding + Math.random() * (canvasWidth - padding * 2);
   
-  // Spawn at bottom of canvas (below visible area)
+  // Spawn at bottom of visible canvas area (so balloons appear immediately)
   const canvasHeight = 600;
-  const startY = canvasHeight + 60;
+  const balloonHeight = 110;
+  const startY = canvasHeight - balloonHeight - 20; // Start at bottom of visible area
   
   const balloon: Balloon = {
     id,
     word,
     x,
     y: startY,
-    // Negative speed to float upward
+    // Negative speed to float upward (balloons float up)
     speed: -(config.balloonSpeedMin + Math.random() * (config.balloonSpeedMax - config.balloonSpeedMin)),
     wobble: Math.random() * Math.PI * 2,
     wobbleSpeed: 0.02 + Math.random() * 0.02,
@@ -31,23 +32,32 @@ export function createBalloon(word: DictWord, canvasWidth: number, config: GameC
 
 export function updateBalloon(balloon: Balloon, canvasWidth: number, canvasHeight: number): Balloon {
   if (balloon.popped) {
-    // Popped balloons shrink and fade away
-    return { ...balloon, y: balloon.y - 3, scale: balloon.scale * 0.92 };
+    // Popped balloons shrink and fade away, then respawn at bottom
+    const newScale = balloon.scale * 0.92;
+    let newY = balloon.y - 3;
+    
+    // When popped balloon shrinks away, respawn it at bottom
+    if (newScale <= 0.05) {
+      const padding = 80;
+      const x = padding + Math.random() * (canvasWidth - padding * 2);
+      return {
+        ...balloon,
+        x,
+        y: canvasHeight - 110, // Start at bottom
+        scale: 1,
+        popped: false,
+        wobble: Math.random() * Math.PI * 2,
+      };
+    }
+    
+    return { ...balloon, y: newY, scale: newScale };
   }
 
+  // Active balloon floats upward
   let newY = balloon.y + balloon.speed;
   const wobbleX = Math.sin(balloon.wobble) * 2;
   const newWobble = balloon.wobble + balloon.wobbleSpeed;
 
-  // Keep balloon within canvas bounds - wrap around when reaching top
-  const balloonHeight = 110; // balloon height with string
-  const bottomSpawn = canvasHeight + 50; // spawn below canvas
-  
-  // If balloon goes above visible area, wrap to bottom to respawn
-  if (newY < -balloonHeight) {
-    newY = bottomSpawn;
-  }
-  
   // Keep balloon within horizontal bounds
   let newX = balloon.x + wobbleX;
   const balloonWidth = 45;
@@ -55,6 +65,15 @@ export function updateBalloon(balloon: Balloon, canvasWidth: number, canvasHeigh
     newX = balloonWidth;
   } else if (newX > canvasWidth - balloonWidth) {
     newX = canvasWidth - balloonWidth;
+  }
+  
+  // If balloon goes above the canvas, bounce it back to the bottom
+  const balloonTop = -55; // Top of balloon (accounting for string)
+  if (newY < balloonTop) {
+    // Respawn at bottom with new random x position
+    const padding = 80;
+    newX = padding + Math.random() * (canvasWidth - padding * 2);
+    newY = canvasHeight - 110; // Start at bottom
   }
   
   return {
